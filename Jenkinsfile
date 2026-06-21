@@ -17,8 +17,27 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                bat 'npx cucumber-js'
+                bat 'npx cucumber-js --format json:reports/cucumber-report.json'
             }
+        }
+
+        stage('Generate Report') {
+            steps {
+                bat 'node generateReport.js'
+            }
+        }
+    }
+
+    post {
+        always {
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'reports',
+                reportFiles: 'cucumber-report.html',
+                reportName: 'BDD Automation Report'
+            ])
         }
     }
 }
